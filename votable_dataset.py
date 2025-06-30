@@ -20,7 +20,7 @@ class VotableDataset():
     -> Class label (1 for Ha-emitters, 0 for non Ha-emitters)
     -> mode = {train, val, test}
     -> the ratio for splitting training dataset to train and validaton 
-       (not used if mode = 'train')
+       (not used if mode = 'test')
     """
 
     def __init__(self, directory, label, mode, train_val_split = 0.0): 
@@ -63,12 +63,20 @@ class VotableDataset():
 
         #normalised_flux = (flux - np.median(flux)) / np.std(flux)
 
+        """
+        THIS IS CRUCIAL! 
+
+        The flux of each spectrum needs to be standardized,
+        i.e. remove the mean and divide by the variance, of all flux values of this spectrum
+        """
         standardised_flux = self.scaler.fit_transform(flux.reshape(-1, 1)).flatten()
 
 
         flux_tensor = torch.tensor(standardised_flux, dtype = torch.float32)
         label_tensor = torch.tensor(self.label, dtype = torch.long)
 
+
+        # Useful to extract ID from each spectrum and store it in the dataset given to the model
         id = (xml_file.split('.')[0]).split(' ')[-1]
 
         return flux_tensor, label_tensor, id

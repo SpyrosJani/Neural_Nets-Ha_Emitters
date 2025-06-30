@@ -1,7 +1,11 @@
 import torch.nn.functional as F 
 from torch import nn 
 
+"""
+This defines residual convolutional blocks 
 
+They have not been used on this work
+"""
 class ResidualBlock(nn.Module):
     def __init__(self, channels, kernel):
         super(ResidualBlock, self).__init__()
@@ -28,6 +32,14 @@ class ResidualBlock(nn.Module):
         output = F.relu(out)
 
         return output
+
+"""
+Each convolutional block contains the following: 
+-> A convolution operation
+-> A batch normalisation
+-> A ReLU activation function
+-> Max pooling operation (not in every block), used for reducing dimensions
+"""
 
 class CNN(nn.Module):
     def __init__(self, input_size, num_classes = 2):

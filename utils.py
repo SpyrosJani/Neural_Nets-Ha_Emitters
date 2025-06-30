@@ -2,6 +2,7 @@
 Here we define various pipelines and tools we use in the training, mainly: 
 -> The training pipeline per epoch 
 -> The validation pipeline per epoch
+-> The testing (inference) routine 
 -> The EarlyStopper class 
 """
 
@@ -80,7 +81,10 @@ def validate(dataloader, model, criterion, device):
     return val_accuracy, val_loss
 
 def test(dataloader, model, device, criterion):
-    model.eval()  # Set model to evaluation mode
+
+    # Model must be set to evaluation mode 
+    model.eval()
+
     running_loss = 0.0
 
     predictions = []
@@ -100,6 +104,9 @@ def test(dataloader, model, device, criterion):
             # Get predictions
             _, predicted = torch.max(pred.data, 1)
 
+            #This commented segment is used for finding 
+            #which GAIA spectra are misclassified. 
+            '''
             if (predicted != y): 
                 print("Misclassification on object with id: ", id)
                 plt.plot(np.arange(336, 1022, 2), X.cpu().numpy()[0])
@@ -107,7 +114,7 @@ def test(dataloader, model, device, criterion):
                 plt.xlabel('Wavelength (nm)')
                 plt.ylabel('Standardized Flux Value')
                 plt.show()
-            
+            '''
             # Store predictions and labels
             predictions.extend(predicted.cpu().numpy())
             all_labels.extend(y.cpu().numpy())
@@ -118,7 +125,7 @@ def test(dataloader, model, device, criterion):
 
     print(f"Testing accuracy: {test_accuracy:.2f}%, Testing Loss: {test_loss:.4f}")
 
-    # Calculate additional metrics
+    # Calculate precision, recall, f1-score
     precision = precision_score(all_labels, predictions, zero_division=0)
     recall = recall_score(all_labels, predictions, zero_division=0)
     f1 = f1_score(all_labels, predictions, zero_division=0)
@@ -127,6 +134,7 @@ def test(dataloader, model, device, criterion):
     print(f"Recall: {recall:.4f}")
     print(f"F1-Score: {f1:.4f}")
 
+    # Caclulate and display confusion matrix
     conf_matrix = confusion_matrix(all_labels, predictions)
     print("Confusion Matrix:")
     print(conf_matrix)
@@ -165,6 +173,12 @@ class EarlyStopper:
 
     def early_stop(self, validation_loss): 
 
+        """
+        Use validation loss as metric 
+        If after for a consecutive specified number of epochs 
+        the validation loss is not reduced, terminate the training 
+        in order to avoid overfitting 
+        """
         if validation_loss <= self.min_loss: 
 
             self.min_loss = validation_loss

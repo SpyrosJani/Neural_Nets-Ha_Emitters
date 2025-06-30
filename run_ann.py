@@ -38,10 +38,7 @@ val_best_accuracy = 0.0
 
 # Set the device 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# Defines image transformations 
-# TO-DO: 
-#       -> calculate mean and deviation of dataset in separate script
-#       -> see possible methods for augmentation (flipping, rotating, darkening, etc.)
+# Defines image transformations
 transform = v2.Compose ([
     v2.ToImage(),
     v2.Grayscale(num_output_channels = 1),
@@ -119,7 +116,11 @@ val_loader = DataLoader(val_subset, batch_size = batch_size, shuffle = False)
 test_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False)
 
 
-# Instantiate model
+"""
+Instantiate both models: 
+-> Simple fully-connected network (ANN), or 
+-> Convolutional network (CNN)
+"""
 #model = ANN(input_size = input_size, hidden_sizes = [128, 32], dropouts = [0, 0], num_classes = 2)
 model = CNN(input_size=input_size, num_classes=2)
 print(summary(model, (343,)))

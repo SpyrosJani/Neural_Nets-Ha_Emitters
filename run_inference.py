@@ -1,3 +1,10 @@
+"""
+This script is used for performing the final evalutaion (inference) of our models 
+
+It is needed to have the .pth file from the training of the model
+"""
+
+
 from cnn_class import CNN
 from ann_class import ANN
 import torch
@@ -20,6 +27,8 @@ test_noDetected = VotableDataset(directory = os.path.join(test_path, 'Ha_noDetec
 test_dataset = ConcatDataset([test_detected, test_noDetected])
 test_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False)
 
+
+# Define whether the model you want to test is a CNN or a fully-connected (ANN) one
 
 best_model = CNN(input_size=input_size, num_classes=2)
 #best_model = ANN(input_size = input_size, hidden_sizes = [128, 32], dropouts = [0, 0], num_classes = 2)
